@@ -10,13 +10,13 @@ import {
   DollarSign,
   Calendar,
   Gauge,
-  Tag,
+  
   Edit2,
   Trash2,
   Plus,
   Loader2,
-  Search,
-  Check,
+  
+  ,
   AlertCircle,
   TrendingUp,
   PieChart,
