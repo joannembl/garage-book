@@ -70,7 +70,10 @@ export function DashboardLayout({
         .slice(0, 2)
         .toUpperCase()
     }
-    return user.email.slice(0, 2).toUpperCase()
+    if (user.email) {
+      return user.email.slice(0, 2).toUpperCase()
+    }
+    return 'GB'
   }
 
   const NavLinks = ({ onClick }: { onClick?: () => void }) => (

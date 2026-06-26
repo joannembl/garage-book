@@ -70,10 +70,8 @@ export async function getVehicles(): Promise<VehicleData[]> {
   const vehiclesCookie = cookieStore.get('garagebook_vehicles')
 
   if (!vehiclesCookie) {
-    // Pre-populate with the sample Miata if no vehicles exist
-    const initialList = [SAMPLE_MIATA]
-    cookieStore.set('garagebook_vehicles', JSON.stringify(initialList), { path: '/' })
-    return initialList
+    // Return sample data if no vehicles exist — don't set cookies during render
+    return [SAMPLE_MIATA]
   }
 
   try {
