@@ -519,6 +519,54 @@ export async function getServiceRecords(vehicleId: string): Promise<ServiceRecor
   }
 }
 
+// Auto-sync vehicle odometer when a service record logs higher mileage
+async function syncVehicleMileage(vehicleId: string, newMileage: number) {
+  const user = await getCurrentUser()
+  if (!user) return
+
+  const hasRealKeys = await isSupabaseConfigured()
+
+  if (hasRealKeys) {
+    try {
+      const supabase = await createClient()
+      const { data: vehicle } = await supabase
+        .from('vehicles')
+        .select('current_mileage')
+        .eq('id', vehicleId)
+        .single()
+
+      if (vehicle && (!vehicle.current_mileage || newMileage > vehicle.current_mileage)) {
+        await supabase
+          .from('vehicles')
+          .update({ current_mileage: newMileage })
+          .eq('id', vehicleId)
+      }
+    } catch (e) {
+      console.error('Failed to sync mileage:', e)
+    }
+    return
+  }
+
+  // Fallback cookie-based sync
+  const cookieStore = await cookies()
+  const vehiclesCookie = cookieStore.get('garagebook_vehicles')
+  if (!vehiclesCookie) return
+
+  try {
+    const list = JSON.parse(vehiclesCookie.value) as VehicleData[]
+    const idx = list.findIndex(v => v.id === vehicleId)
+    if (idx !== -1) {
+      const current = list[idx].current_mileage
+      if (!current || newMileage > current) {
+        list[idx].current_mileage = newMileage
+        cookieStore.set('garagebook_vehicles', JSON.stringify(list), { path: '/' })
+      }
+    }
+  } catch {
+    // ignore
+  }
+}
+
 export async function addServiceRecord(vehicleId: string, formData: FormData) {
   const user = await getCurrentUser()
   if (!user) return { error: 'Not logged in' }
@@ -529,6 +577,7 @@ export async function addServiceRecord(vehicleId: string, formData: FormData) {
   const description = formData.get('description') as string || null
   const costStr = formData.get('cost') as string
   const shopName = formData.get('shop_name') as string || null
+  const receiptData = formData.get('receipt_data') as string || null
 
   const mileage = parseInt(mileageStr, 10)
   const cost = costStr ? parseFloat(costStr) : 0
@@ -546,7 +595,7 @@ export async function addServiceRecord(vehicleId: string, formData: FormData) {
     description: description ? description.trim() : null,
     cost: isNaN(cost) ? 0 : cost,
     shop_name: shopName ? shopName.trim() : null,
-    receipt_url: null,
+    receipt_url: receiptData || null,
     created_at: new Date().toISOString()
   }
 
@@ -565,11 +614,16 @@ export async function addServiceRecord(vehicleId: string, formData: FormData) {
           description: newRecord.description,
           cost: newRecord.cost,
           shop_name: newRecord.shop_name,
+          receipt_url: newRecord.receipt_url,
         })
         .select()
         .single()
 
       if (error) return { error: error.message }
+
+      // Sync mileage if higher
+      await syncVehicleMileage(vehicleId, mileage)
+
       revalidatePath(`/vehicles/${vehicleId}`)
       revalidatePath('/')
       return { success: true, record: data }
@@ -593,6 +647,10 @@ export async function addServiceRecord(vehicleId: string, formData: FormData) {
 
   list.push(newRecord)
   cookieStore.set('garagebook_maintenance', JSON.stringify(list), { path: '/' })
+
+  // Sync mileage if higher (cookie fallback)
+  await syncVehicleMileage(vehicleId, mileage)
+
   revalidatePath(`/vehicles/${vehicleId}`)
   revalidatePath('/')
   return { success: true, record: newRecord }

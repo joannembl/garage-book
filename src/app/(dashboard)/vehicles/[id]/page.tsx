@@ -1,6 +1,5 @@
 import React from 'react'
 import { getVehicleById } from '@/app/actions/vehicles'
-import { getCurrentUser } from '@/app/actions/auth'
 import { VehicleDetailClient } from '@/components/vehicles/vehicle-detail-client'
 import { buttonVariants } from '@/components/ui/button'
 import Link from 'next/link'
@@ -13,7 +12,6 @@ interface PageProps {
 export default async function VehicleDetailPage({ params }: PageProps) {
   const { id } = await params
   const vehicle = await getVehicleById(id)
-  const user = await getCurrentUser()
 
   if (!vehicle) {
     return (
@@ -33,8 +31,6 @@ export default async function VehicleDetailPage({ params }: PageProps) {
     )
   }
 
-  const isPro = user?.is_pro || false
-
   return (
     <div className="space-y-6">
       {/* Breadcrumb back */}
@@ -48,7 +44,7 @@ export default async function VehicleDetailPage({ params }: PageProps) {
         </Link>
       </div>
 
-      <VehicleDetailClient vehicle={vehicle} isPro={isPro} />
+      <VehicleDetailClient vehicle={vehicle} />
     </div>
   )
 }
