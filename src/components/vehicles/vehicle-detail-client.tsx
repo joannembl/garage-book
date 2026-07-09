@@ -20,18 +20,22 @@ import {
   getExpenses, addExpense,
   VehicleData, ServiceRecord, ModificationRecord, ExpenseRecord,
 } from '@/app/actions/vehicles'
+import { getVehicleReportData } from '@/app/actions/reports'
+import type { ReportData } from '@/app/actions/reports'
 import { OverviewTab } from '@/components/vehicles/vehicle-overview-tab'
 import { ServiceTab } from '@/components/vehicles/vehicle-service-tab'
 import { ModsTab } from '@/components/vehicles/vehicle-mods-tab'
 import { ExpensesTab } from '@/components/vehicles/vehicle-expenses-tab'
+import { ExportReportDialog } from '@/components/vehicles/export-report-dialog'
 
 interface VehicleDetailClientProps {
   vehicle: VehicleData
+  isPro: boolean
 }
 
 type TabId = 'overview' | 'service' | 'mods' | 'expenses'
 
-export function VehicleDetailClient({ vehicle }: VehicleDetailClientProps) {
+export function VehicleDetailClient({ vehicle, isPro }: VehicleDetailClientProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -40,6 +44,9 @@ export function VehicleDetailClient({ vehicle }: VehicleDetailClientProps) {
   const [mods, setMods] = useState<ModificationRecord[]>([])
   const [expenses, setExpenses] = useState<ExpenseRecord[]>([])
   const [isLoadingLogs, setIsLoadingLogs] = useState(true)
+
+  // Report data
+  const [reportData, setReportData] = useState<ReportData | null>(null)
 
   // Active tab
   const initialTab = (searchParams.get('tab') as TabId) || 'overview'
@@ -88,6 +95,19 @@ export function VehicleDetailClient({ vehicle }: VehicleDetailClientProps) {
   }
 
   useEffect(() => { fetchAllLogs() }, [vehicle.id])
+
+  // Fetch report data for export
+  const handleGenerateReport = async () => {
+    if (reportData) return // already loaded
+    try {
+      const result = await getVehicleReportData(vehicle.id)
+      if (!('error' in result)) {
+        setReportData(result)
+      }
+    } catch (e) {
+      console.error('Failed to load report data:', e)
+    }
+  }
 
   useEffect(() => {
     const tabParam = searchParams.get('tab') as TabId
@@ -187,6 +207,13 @@ export function VehicleDetailClient({ vehicle }: VehicleDetailClientProps) {
 
           {/* Edit/Delete Actions */}
           <div className="flex gap-2 shrink-0">
+            {/* Export Report Button */}
+            <ExportReportDialog
+              isPro={isPro}
+              reportData={reportData}
+              onGenerateReport={handleGenerateReport}
+            />
+
             {/* Edit Button */}
             <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
               <Button variant="outline" size="sm" className="text-xs font-semibold h-9"
