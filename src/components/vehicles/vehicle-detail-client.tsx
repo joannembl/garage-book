@@ -48,6 +48,7 @@ import {
   ModificationRecord,
   ExpenseRecord,
 } from '@/app/actions/vehicles'
+import { ImportLogsDialog } from './import-logs-dialog'
 
 interface VehicleDetailClientProps {
   vehicle: VehicleData
@@ -811,72 +812,79 @@ export function VehicleDetailClient({ vehicle, isPro }: VehicleDetailClientProps
             <div className="flex justify-between items-center">
               <h3 className="text-base font-bold tracking-tight">Upkeep & Service Log</h3>
               
-              {/* Quick Add Service Modal */}
-              <Dialog open={isAddServiceOpen} onOpenChange={(open) => {
-                setIsAddServiceOpen(open)
-                if (!open) setLogError(null)
-              }}>
-                <DialogTrigger render={
-                  <Button className="flex items-center gap-1 shadow-sm text-xs font-semibold h-8">
-                    <Plus className="h-3.5 w-3.5" />
-                    <span>Quick Log Service</span>
-                  </Button>
-                } />
+              <div className="flex flex-wrap gap-2">
+                <Dialog open={isAddServiceOpen} onOpenChange={(open) => {
+                  setIsAddServiceOpen(open)
+                  if (!open) setLogError(null)
+                }}>
+                  <DialogTrigger render={
+                    <Button className="flex items-center gap-1 shadow-sm text-xs font-semibold h-8">
+                      <Plus className="h-3.5 w-3.5" />
+                      <span>Quick Log Service</span>
+                    </Button>
+                  } />
 
-                <DialogContent className="sm:max-w-md">
-                  <DialogHeader>
-                    <DialogTitle className="text-base font-bold">Log Maintenance Service</DialogTitle>
-                    <DialogDescription className="text-xs text-muted-foreground">
-                      Record repairs, replacement items, or fluid upgrades.
-                    </DialogDescription>
-                  </DialogHeader>
+                  <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                      <DialogTitle className="text-base font-bold">Log Maintenance Service</DialogTitle>
+                      <DialogDescription className="text-xs text-muted-foreground">
+                        Record repairs, replacement items, or fluid upgrades.
+                      </DialogDescription>
+                    </DialogHeader>
 
-                  <form onSubmit={handleAddServiceSubmit} className="space-y-4 mt-1">
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="space-y-1">
-                        <label className="text-[11px] font-semibold text-muted-foreground">Service Date *</label>
-                        <Input type="date" name="service_date" defaultValue={new Date().toISOString().split('T')[0]} required className="h-9 text-xs" />
+                    <form onSubmit={handleAddServiceSubmit} className="space-y-4 mt-1">
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-1">
+                          <label className="text-[11px] font-semibold text-muted-foreground">Service Date *</label>
+                          <Input type="date" name="service_date" defaultValue={new Date().toISOString().split('T')[0]} required className="h-9 text-xs" />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[11px] font-semibold text-muted-foreground">Odometer reading (mi) *</label>
+                          <Input type="number" name="mileage" placeholder="e.g. 124200" required className="h-9 text-xs" />
+                        </div>
                       </div>
+
                       <div className="space-y-1">
-                        <label className="text-[11px] font-semibold text-muted-foreground">Odometer reading (mi) *</label>
-                        <Input type="number" name="mileage" placeholder="e.g. 124200" required className="h-9 text-xs" />
+                        <label className="text-[11px] font-semibold text-muted-foreground">Service Type *</label>
+                        <Input type="text" name="service_type" placeholder="e.g. Oil Change & Filter" required className="h-9 text-xs" />
                       </div>
-                    </div>
 
-                    <div className="space-y-1">
-                      <label className="text-[11px] font-semibold text-muted-foreground">Service Type *</label>
-                      <Input type="text" name="service_type" placeholder="e.g. Oil Change & Filter" required className="h-9 text-xs" />
-                    </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-1">
+                          <label className="text-[11px] font-semibold text-muted-foreground">Total Cost ($) *</label>
+                          <Input type="number" step="0.01" name="cost" placeholder="e.g. 45" className="h-9 text-xs" />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[11px] font-semibold text-muted-foreground">Shop / Mechanic Name</label>
+                          <Input type="text" name="shop_name" placeholder="e.g. Local Garage or DIY" className="h-9 text-xs" />
+                        </div>
+                      </div>
 
-                    <div className="grid grid-cols-2 gap-3">
                       <div className="space-y-1">
-                        <label className="text-[11px] font-semibold text-muted-foreground">Total Cost ($) *</label>
-                        <Input type="number" step="0.01" name="cost" placeholder="e.g. 45" className="h-9 text-xs" />
+                        <label className="text-[11px] font-semibold text-muted-foreground">Notes / Description</label>
+                        <Input type="text" name="description" placeholder="e.g. Mobil1 10W-30 Synthetic oil with OEM filter" className="h-9 text-xs" />
                       </div>
-                      <div className="space-y-1">
-                        <label className="text-[11px] font-semibold text-muted-foreground">Shop / Mechanic Name</label>
-                        <Input type="text" name="shop_name" placeholder="e.g. Local Garage or DIY" className="h-9 text-xs" />
-                      </div>
-                    </div>
 
-                    <div className="space-y-1">
-                      <label className="text-[11px] font-semibold text-muted-foreground">Notes / Description</label>
-                      <Input type="text" name="description" placeholder="e.g. Mobil1 10W-30 Synthetic oil with OEM filter" className="h-9 text-xs" />
-                    </div>
+                      {logError && <p className="text-xs text-destructive bg-destructive/5 p-2 rounded">{logError}</p>}
 
-                    {logError && <p className="text-xs text-destructive bg-destructive/5 p-2 rounded">{logError}</p>}
+                      <DialogFooter className="pt-2">
+                        <Button type="button" variant="outline" className="text-xs h-9" onClick={() => setIsAddServiceOpen(false)}>
+                          Cancel
+                        </Button>
+                        <Button type="submit" disabled={isLogSubmitting} className="text-xs h-9">
+                          {isLogSubmitting ? 'Logging...' : 'Log Record'}
+                        </Button>
+                      </DialogFooter>
+                    </form>
+                  </DialogContent>
+                </Dialog>
 
-                    <DialogFooter className="pt-2">
-                      <Button type="button" variant="outline" className="text-xs h-9" onClick={() => setIsAddServiceOpen(false)}>
-                        Cancel
-                      </Button>
-                      <Button type="submit" disabled={isLogSubmitting} className="text-xs h-9">
-                        {isLogSubmitting ? 'Logging...' : 'Log Record'}
-                      </Button>
-                    </DialogFooter>
-                  </form>
-                </DialogContent>
-              </Dialog>
+                <ImportLogsDialog 
+                  vehicleId={vehicle.id} 
+                  isPro={isPro} 
+                  onImportComplete={() => fetchAllLogs()} 
+                />
+              </div>
             </div>
 
             {isLoadingLogs ? (
