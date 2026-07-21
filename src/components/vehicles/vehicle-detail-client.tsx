@@ -27,6 +27,7 @@ import { ServiceTab } from '@/components/vehicles/vehicle-service-tab'
 import { ModsTab } from '@/components/vehicles/vehicle-mods-tab'
 import { ExpensesTab } from '@/components/vehicles/vehicle-expenses-tab'
 import { ExportReportDialog } from '@/components/vehicles/export-report-dialog'
+import { ImportLogsDialog } from '@/components/vehicles/import-logs-dialog'
 
 interface VehicleDetailClientProps {
   vehicle: VehicleData
@@ -212,6 +213,13 @@ export function VehicleDetailClient({ vehicle, isPro }: VehicleDetailClientProps
               isPro={isPro}
               reportData={reportData}
               onGenerateReport={handleGenerateReport}
+            />
+
+            {/* Import Logs Button */}
+            <ImportLogsDialog
+              vehicleId={vehicle.id}
+              isPro={isPro}
+              onImportComplete={fetchAllLogs}
             />
 
             {/* Edit Button */}
