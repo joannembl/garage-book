@@ -160,7 +160,7 @@ export function VehicleDetailClient({ vehicle, isPro }: VehicleDetailClientProps
     try {
       const result = await deleteVehicle(vehicle.id)
       if (result.error) setDeleteError(result.error)
-      else { setIsDeleteOpen(false); router.push('/'); router.refresh() }
+      else { setIsDeleteOpen(false); router.push('/dashboard'); router.refresh() }
     } catch { setDeleteError('An error occurred during deletion.') }
     finally { setIsDeleting(false) }
   }

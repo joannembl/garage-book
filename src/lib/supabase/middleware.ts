@@ -60,20 +60,21 @@ export async function updateSession(request: NextRequest) {
   }
 
   const isAuthPage = request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/signup'
+  const isLandingPage = request.nextUrl.pathname === '/'
 
   // 3. Redirection logic
   if (!user) {
-    // If not authenticated and NOT on an auth page, redirect to /login
-    if (!isAuthPage) {
+    // If not authenticated and NOT on an auth page or landing page, redirect to /login
+    if (!isAuthPage && !isLandingPage) {
       const redirectUrl = request.nextUrl.clone()
       redirectUrl.pathname = '/login'
       return NextResponse.redirect(redirectUrl)
     }
   } else {
-    // If authenticated and trying to access an auth page, redirect to / (Garage)
+    // If authenticated and trying to access an auth page, redirect to /dashboard
     if (isAuthPage) {
       const redirectUrl = request.nextUrl.clone()
-      redirectUrl.pathname = '/'
+      redirectUrl.pathname = '/dashboard'
       return NextResponse.redirect(redirectUrl)
     }
   }

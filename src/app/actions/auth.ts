@@ -86,7 +86,7 @@ export async function login(formData: FormData) {
       const cookieStore = await cookies()
       cookieStore.set('garagebook_logged_in', 'true', { path: '/' })
       
-      redirect('/')
+      redirect('/dashboard')
     } catch (e) {
       if (e && typeof e === 'object' && 'digest' in e && typeof (e as { digest: unknown }).digest === 'string' && (e as { digest: string }).digest.includes('NEXT_REDIRECT')) throw e
       return { error: e instanceof Error ? e.message : 'Authentication failed' }
@@ -104,7 +104,7 @@ export async function login(formData: FormData) {
   cookieStore.set('garagebook_session', JSON.stringify(mockUser), { path: '/' })
   cookieStore.set('garagebook_logged_in', 'true', { path: '/' })
   
-  redirect('/')
+  redirect('/dashboard')
 }
 
 export async function signup(formData: FormData) {
@@ -139,7 +139,7 @@ export async function signup(formData: FormData) {
       const cookieStore = await cookies()
       cookieStore.set('garagebook_logged_in', 'true', { path: '/' })
       
-      redirect('/')
+      redirect('/dashboard')
     } catch (e) {
       if (e && typeof e === 'object' && 'digest' in e && typeof (e as { digest: unknown }).digest === 'string' && (e as { digest: string }).digest.includes('NEXT_REDIRECT')) throw e
       return { error: e instanceof Error ? e.message : 'Registration failed' }
@@ -157,7 +157,7 @@ export async function signup(formData: FormData) {
   cookieStore.set('garagebook_session', JSON.stringify(mockUser), { path: '/' })
   cookieStore.set('garagebook_logged_in', 'true', { path: '/' })
   
-  redirect('/')
+  redirect('/dashboard')
 }
 
 export async function signOut() {
