@@ -11,7 +11,8 @@ import {
   ChevronRight, 
   FileText,
   Zap,
-  Check
+  Check,
+  ShieldCheck
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { getCurrentUser } from '@/app/actions/auth'
@@ -45,6 +46,7 @@ export default async function LandingPage() {
 
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-zinc-400">
             <a href="#features" className="hover:text-white transition-colors">Features</a>
+            <Link href="/compare" className="hover:text-white transition-colors text-red-500 font-bold tracking-tight">Why GarageBook?</Link>
             <a href="#how-it-works" className="hover:text-white transition-colors">How It Works</a>
             <a href="#pro" className="hover:text-white transition-colors">Pro</a>
             <a href="#faq" className="hover:text-white transition-colors">FAQ</a>
@@ -94,6 +96,11 @@ export default async function LandingPage() {
                   <ChevronRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
+              <a href="#features">
+                <Button size="lg" variant="outline" className="border-white/10 bg-white/5 hover:bg-white/10 text-white font-bold h-14 px-10 text-lg backdrop-blur-sm">
+                  Explore Features
+                </Button>
+              </a>
             </div>
             <p className="text-sm text-zinc-500 font-medium mb-20">
               No credit card · 1 car free
@@ -150,6 +157,13 @@ export default async function LandingPage() {
                 title="Expenses"
                 description="Fuel, insurance, registration — know exactly what your car costs to run."
               />
+            </div>
+
+            <div className="mt-16 text-center">
+               <Link href="/compare" className="inline-flex items-center gap-2 text-zinc-500 hover:text-white transition-colors group">
+                  <span className="text-sm font-bold uppercase tracking-widest">Still using a spreadsheet? See the difference</span>
+                  <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+               </Link>
             </div>
           </div>
         </section>

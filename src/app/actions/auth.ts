@@ -133,8 +133,21 @@ export async function signup(formData: FormData) {
       if (error) return { error: error.message }
       
       // Auto login
-      const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
+      const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({ email, password })
       if (signInError) return { error: 'Account created, please log in.' }
+
+      // Track signup event
+      try {
+        const { getUTMDataFromCookie, trackEvent } = await import('./analytics')
+        const utmData = await getUTMDataFromCookie()
+        await trackEvent({
+          event_type: 'signup',
+          user_id: authData.user?.id,
+          ...utmData
+        })
+      } catch (e) {
+        console.error('Failed to track signup:', e)
+      }
 
       const cookieStore = await cookies()
       cookieStore.set('garagebook_logged_in', 'true', { path: '/' })
@@ -152,6 +165,19 @@ export async function signup(formData: FormData) {
     ...DEFAULT_MOCK_USER,
     email: email,
     full_name: fullName || email.split('@')[0].toUpperCase(),
+  }
+
+  // Track mock signup event
+  try {
+    const { getUTMDataFromCookie, trackEvent } = await import('./analytics')
+    const utmData = await getUTMDataFromCookie()
+    await trackEvent({
+      event_type: 'signup',
+      user_id: mockUser.id,
+      ...utmData
+    })
+  } catch (e) {
+    console.error('Failed to track mock signup:', e)
   }
 
   cookieStore.set('garagebook_session', JSON.stringify(mockUser), { path: '/' })
