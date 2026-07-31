@@ -86,7 +86,7 @@ export async function login(formData: FormData) {
       const cookieStore = await cookies()
       cookieStore.set('garagebook_logged_in', 'true', { path: '/' })
       
-      redirect('/')
+      redirect('/dashboard')
     } catch (e) {
       if (e && typeof e === 'object' && 'digest' in e && typeof (e as { digest: unknown }).digest === 'string' && (e as { digest: string }).digest.includes('NEXT_REDIRECT')) throw e
       return { error: e instanceof Error ? e.message : 'Authentication failed' }
@@ -104,7 +104,7 @@ export async function login(formData: FormData) {
   cookieStore.set('garagebook_session', JSON.stringify(mockUser), { path: '/' })
   cookieStore.set('garagebook_logged_in', 'true', { path: '/' })
   
-  redirect('/')
+  redirect('/dashboard')
 }
 
 export async function signup(formData: FormData) {
@@ -133,13 +133,26 @@ export async function signup(formData: FormData) {
       if (error) return { error: error.message }
       
       // Auto login
-      const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
+      const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({ email, password })
       if (signInError) return { error: 'Account created, please log in.' }
+
+      // Track signup event
+      try {
+        const { getUTMDataFromCookie, trackEvent } = await import('./analytics')
+        const utmData = await getUTMDataFromCookie()
+        await trackEvent({
+          event_type: 'signup',
+          user_id: authData.user?.id,
+          ...utmData
+        })
+      } catch (e) {
+        console.error('Failed to track signup:', e)
+      }
 
       const cookieStore = await cookies()
       cookieStore.set('garagebook_logged_in', 'true', { path: '/' })
       
-      redirect('/')
+      redirect('/dashboard')
     } catch (e) {
       if (e && typeof e === 'object' && 'digest' in e && typeof (e as { digest: unknown }).digest === 'string' && (e as { digest: string }).digest.includes('NEXT_REDIRECT')) throw e
       return { error: e instanceof Error ? e.message : 'Registration failed' }
@@ -154,10 +167,23 @@ export async function signup(formData: FormData) {
     full_name: fullName || email.split('@')[0].toUpperCase(),
   }
 
+  // Track mock signup event
+  try {
+    const { getUTMDataFromCookie, trackEvent } = await import('./analytics')
+    const utmData = await getUTMDataFromCookie()
+    await trackEvent({
+      event_type: 'signup',
+      user_id: mockUser.id,
+      ...utmData
+    })
+  } catch (e) {
+    console.error('Failed to track mock signup:', e)
+  }
+
   cookieStore.set('garagebook_session', JSON.stringify(mockUser), { path: '/' })
   cookieStore.set('garagebook_logged_in', 'true', { path: '/' })
   
-  redirect('/')
+  redirect('/dashboard')
 }
 
 export async function signOut() {

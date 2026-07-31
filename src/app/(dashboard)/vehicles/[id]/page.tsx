@@ -23,7 +23,7 @@ export default async function VehicleDetailPage({ params }: PageProps) {
         <p className="text-sm text-muted-foreground max-w-sm mt-1 mb-6">
           The vehicle you are trying to view does not exist or you do not have permission to access it.
         </p>
-        <Link href="/" className={buttonVariants({ size: 'sm', variant: 'default' })}>
+        <Link href="/dashboard" className={buttonVariants({ size: 'sm', variant: 'default' })}>
           <ArrowLeft className="h-4 w-4 mr-1.5" />
           <span>Back to Garage</span>
         </Link>
@@ -36,7 +36,7 @@ export default async function VehicleDetailPage({ params }: PageProps) {
       {/* Breadcrumb back */}
       <div className="flex items-center">
         <Link 
-          href="/" 
+          href="/dashboard" 
           className="text-xs font-semibold text-muted-foreground hover:text-foreground flex items-center gap-1.5"
         >
           <ArrowLeft className="h-3.5 w-3.5" />

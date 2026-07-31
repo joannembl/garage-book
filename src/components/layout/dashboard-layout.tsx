@@ -26,7 +26,7 @@ interface NavItem {
 }
 
 const navigation: NavItem[] = [
-  { name: 'Garage', href: '/', icon: Car },
+  { name: 'Garage', href: '/dashboard', icon: Car },
   { name: 'Maintenance Log', href: '/maintenance', icon: Wrench },
   { name: 'Modifications', href: '/modifications', icon: Sliders },
   { name: 'Expenses', href: '/expenses', icon: Receipt },
@@ -107,7 +107,7 @@ export function DashboardLayout({
       {/* Desktop Sidebar */}
       <aside className="hidden border-r bg-card md:flex md:w-64 md:flex-col md:fixed md:inset-y-0">
         <div className="flex h-16 items-center justify-between border-b px-6">
-          <Link href="/" className="flex items-center gap-2.5 font-bold text-xl tracking-tight">
+          <Link href="/dashboard" className="flex items-center gap-2.5 font-bold text-xl tracking-tight">
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
               <Car className="h-5 w-5" />
             </span>
@@ -192,7 +192,7 @@ export function DashboardLayout({
               <SheetContent side="left" className="w-72 p-0 flex flex-col h-full bg-card">
                 <div className="flex h-16 items-center justify-between border-b px-6 shrink-0">
                   <Link
-                    href="/"
+                    href="/dashboard"
                     onClick={() => setIsOpen(false)}
                     className="flex items-center gap-2.5 font-bold text-xl tracking-tight"
                   >
