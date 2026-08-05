@@ -12,10 +12,12 @@ import {
   FileText,
   Zap,
   Check,
-  ShieldCheck
+  ShieldCheck,
+  Send
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { getCurrentUser } from '@/app/actions/auth'
+import { EmailCapture } from '@/components/marketing/EmailCapture'
 
 export const metadata: Metadata = {
   title: 'GarageBook — Digital Logbook for Car Enthusiasts | Track Maintenance, Mods & Expenses',
@@ -246,6 +248,13 @@ export default async function LandingPage() {
                />
             </div>
           </div>
+        </section>
+
+        {/* Section 4.5: Email Capture */}
+        <section className="py-24 relative overflow-hidden bg-zinc-950/50">
+           <div className="max-w-7xl mx-auto px-4 relative z-10">
+              <EmailCapture />
+           </div>
         </section>
 
         {/* Section 5: Pricing Table */}
