@@ -60,12 +60,12 @@ export async function updateSession(request: NextRequest) {
   }
 
   const isAuthPage = request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/signup'
-  const isLandingPage = request.nextUrl.pathname === '/'
+  const isPublicPage = request.nextUrl.pathname === '/' || request.nextUrl.pathname === '/compare'
 
   // 3. Redirection logic
   if (!user) {
     // If not authenticated and NOT on an auth page or landing page, redirect to /login
-    if (!isAuthPage && !isLandingPage) {
+    if (!isAuthPage && !isPublicPage) {
       const redirectUrl = request.nextUrl.clone()
       redirectUrl.pathname = '/login'
       return NextResponse.redirect(redirectUrl)
